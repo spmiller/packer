@@ -1,4 +1,4 @@
-package iso
+package common
 
 import (
 	"bufio"
@@ -39,6 +39,20 @@ type ESX5Driver struct {
 }
 
 func (d *ESX5Driver) Clone(dst, src string) error {
+	ret, err := d.sh("test -r %s", src)
+	if err != nil {
+		return errors.New("Source VMX not found")
+	}
+
+	ret, err := d.run(nil, "ls")
+	files := strings.Split(ret, "\n")
+	if err != nil {
+		return errors.New("Error running cmd")
+	}
+	for _, f := range files {
+		log.Printf("One file is: %s", f)
+	}
+	log.Printf("Return was: %s", ret)
 	return errors.New("Cloning is not supported with the ESX driver.")
 }
 
