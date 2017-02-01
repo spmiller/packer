@@ -18,6 +18,7 @@ import (
 	"github.com/mitchellh/multistep"
 	commonssh "github.com/mitchellh/packer/common/ssh"
 	"github.com/mitchellh/packer/communicator/ssh"
+	"github.com/mitchellh/packer/helper/communicator"
 	"github.com/mitchellh/packer/packer"
 	gossh "golang.org/x/crypto/ssh"
 )
@@ -33,6 +34,8 @@ type ESX5Driver struct {
 	Datastore      string
 	CacheDatastore string
 	CacheDirectory string
+	VMName         string
+	CommConfig     communicator.Config
 
 	comm      packer.Communicator
 	outputDir string
@@ -52,9 +55,9 @@ func (d *ESX5Driver) Clone(dst, src string) error {
 	log.Printf("Source: %s\n", srcVmx)
 	log.Printf("Dest: %s\n", dstVmx)
 
-	err := d.sh("mkdir", dstDir)
+	err := d.MkdirAll()
 	if err != nil {
-		return fmt.Errorf("Failed to create the destination directory %s: %s", dstDir, err)
+		return fmt.Errorf("Failed to create the destination directory %s: %s", d.outputDir, err)
 	}
 
 	err = d.sh("cp", srcVmx, dstVmx)
