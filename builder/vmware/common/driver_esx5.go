@@ -65,7 +65,7 @@ func (d *ESX5Driver) Clone(dst, src string) error {
 		return fmt.Errorf("Failed to copy the vmx file %s: %s", srcVmx, err)
 	}
 
-	filesToClone, err := d.run(nil, "find", srcDir, "! -name '*.vmdk' ! -name '*.vmx' -type f")
+	filesToClone, err := d.run(nil, "find", srcDir, "! -name '*.vmdk' ! -name '*.vmx' -type f ! -size 0")
 	if err != nil {
 		return fmt.Errorf("Failing to get the file list to copy: %s", err)
 	}
@@ -92,22 +92,6 @@ func (d *ESX5Driver) Clone(dst, src string) error {
 			return fmt.Errorf("Failing to clone disk %s: %s", srcDisk, err)
 		}
 	}
-
-	//
-	// // FIXME: VMName should be taken from the config.
-	// vmxEdits := []string{
-	// 	"s/\\(display[Nn]ame = \\).*/\\1\"" + vmName + "\"/",
-	// 	"/ethernet..generated[aA]ddress =/d",
-	// 	"/uuid.bios =/d",
-	// 	"/uuid.location =/d",
-	// 	"/vc.uuid =/d",
-	// }
-	// for _, edit := range vmxEdits {
-	// 	err := d.sh("sed -i -e", "'", edit, "'", dstVmx)
-	// 	if err != nil {
-	// 		return fmt.Errorf("Failed to edit the destination file %s: %s", dstVmx, err)
-	// 	}
-	// }
 	log.Printf("Successfully cloned %s to %s\n", src, dst)
 	return nil
 }
